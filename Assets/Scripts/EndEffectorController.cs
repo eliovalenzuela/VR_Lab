@@ -84,10 +84,9 @@ public class EndEffectorController : MonoBehaviour
         applicationStatus = (string)Interface.ReadNodeValue(NodeIdRunningApplication);
         if (!string.IsNullOrEmpty(applicationStatus) || trampeado)
         {
-            if (active)
+            if (active && !SetInitialPosition)
             {
                 StopAllCoroutines();
-                SetInitialPosition = false;
   
                 relativePosition = transform.InverseTransformPoint(initialPoint.transform.position)*1000;
                 relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y), Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
@@ -130,8 +129,8 @@ public class EndEffectorController : MonoBehaviour
                 //TouchActor.transform.position = Flange.position;
                 //TouchActor.transform.rotation = Flange.rotation;
 
-                
-               
+
+                SetInitialPosition = false;
 
                 //socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                 //active = true;
