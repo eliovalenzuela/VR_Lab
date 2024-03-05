@@ -15,16 +15,7 @@ public class FollowObject : MonoBehaviour
     public Quaternion initialRotation;
     public Quaternion initialRotationFollowObject;
 
-    private void OnEnable()
-    {
-        initialPosition = transform.position;
-        initialPositionFollowObject = GOToFollow.transform.position;
-
-        initialRotation = transform.rotation;
-        initialRotationFollowObject = GOToFollow.transform.rotation;
-        active = true;
-    }
-    private void Update()
+    private void FixedUpdate()
     {
         if(GOToFollow != null && active)
         {
@@ -34,5 +25,14 @@ public class FollowObject : MonoBehaviour
             if(rotation)
                 transform.rotation = initialRotation * (GOToFollow.transform.rotation * Quaternion.Inverse(initialRotationFollowObject));
         }
+    }
+
+    public void SetInitialPositions()
+    {
+        initialPosition = transform.position;
+        initialPositionFollowObject = GOToFollow.transform.position;
+
+        initialRotation = transform.rotation;
+        initialRotationFollowObject = GOToFollow.transform.rotation;
     }
 }
