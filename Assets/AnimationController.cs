@@ -12,6 +12,7 @@ public class AnimationController : MonoBehaviour
 
     public AnimateConveyor animadorConveyor;
     public AnimatePlatform animadorPlatform;
+    public AnimateBox animadorBox;
 
     private void Update()
     {
@@ -23,6 +24,7 @@ public class AnimationController : MonoBehaviour
         valorNormalizado = Normalize(myvar, 30, 180);
         animadorPlatform.Animar(valorNormalizado);
         animadorConveyor.Animar(valorNormalizado);
+        animadorBox.Animar(valorNormalizado);
     }
 
     public float Normalize(short value, float min, float max)
