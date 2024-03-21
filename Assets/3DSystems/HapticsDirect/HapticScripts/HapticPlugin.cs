@@ -590,7 +590,7 @@ public class HapticPlugin : MonoBehaviour
     double[] max_extents = { -0.210, -0.110, -0.085, 0.210, 0.205 , 0.130};
     double[] usable_extents = {-0.08, -0.06, -0.035, 0.08, 0.06, 0.035 };
     private Matrix4x4 DeviceTransformRaw;   //!< (Readonly) Stylus transform, in device coordinates.
-    float ScaleFactor = 1.0f;
+    public float ScaleFactor = 1.0f;
     [HideInInspector]
     public Vector3 LastContact;
     [HideInInspector]
