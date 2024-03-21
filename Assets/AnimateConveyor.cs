@@ -40,7 +40,7 @@ public class AnimateConveyor : MonoBehaviour
         actualVelocity = (double)PLC_Interface.ReadNodeValue(NodeIdVelocity);
 
         ConveyorDrive.CurrentPosition = (float)(actualPosition - initialPosition);
-        ConveyorDrive.CurrentSpeed = (float)actualVelocity;
+        ConveyorDrive.CurrentSpeed = (float)-actualVelocity;
     }
 
 
