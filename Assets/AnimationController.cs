@@ -22,9 +22,10 @@ public class AnimationController : MonoBehaviour
     void FixedUpdate()
     {
         valorNormalizado = Normalize(myvar, 30, 180);
+        animadorBox.Animar(valorNormalizado);
         animadorPlatform.Animar(valorNormalizado);
         animadorConveyor.Animar(valorNormalizado);
-        animadorBox.Animar(valorNormalizado);
+        
     }
 
     public float Normalize(short value, float min, float max)
