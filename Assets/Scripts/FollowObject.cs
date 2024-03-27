@@ -32,7 +32,7 @@ public class FollowObject : MonoBehaviour
         initialPosition = transform.position;
         initialPositionFollowObject = GOToFollow.transform.position;
 
-        initialRotation = transform.rotation;
-        initialRotationFollowObject = GOToFollow.transform.rotation;
+        //initialRotation = transform.rotation;
+        //initialRotationFollowObject = GOToFollow.transform.rotation;
     }
 }

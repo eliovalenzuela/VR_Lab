@@ -87,8 +87,8 @@ public class EndEffectorController : MonoBehaviour
             {
                 if (!active)
                 {
-                    EndPoint.position = Flange.position;
-                    EndPoint.rotation = Flange.rotation;
+                    //EndPoint.position = Flange.position;
+                    //EndPoint.rotation = Flange.rotation;
 
                     followObject.SetInitialPositions();
                     followObject.active = false;
@@ -96,11 +96,15 @@ public class EndEffectorController : MonoBehaviour
                     relativePosition = Vector3.zero;
                     relativePositionRounded = Vector3.zero;
 
+                    relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
+                    relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y), Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
+
                     //socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                     //active = true;
                 }
                 else
                 {
+
                     relativePosition = transform.InverseTransformPoint(initialPoint.transform.position)*1000;
                     relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y), Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
 
@@ -167,7 +171,8 @@ public class EndEffectorController : MonoBehaviour
     public void SetWait()
     {
         SetInitialPosition = true;
-
+        EndPoint.position = Flange.position;
+        EndPoint.rotation = Flange.rotation;
         //initialPoint.transform.position = Flange.position;
         //initialPoint.transform.rotation = Flange.rotation;
     }
