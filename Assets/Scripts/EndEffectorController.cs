@@ -5,7 +5,6 @@ using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 using game4automation;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
 
@@ -30,12 +29,20 @@ public class EndEffectorController : MonoBehaviour
     public Vector3 RotationEndPointDegrees = Vector3.zero;
     public Vector3 RotationEndPointDegreesRounded = Vector3.zero;
 
-    public GameObject initialPoint;
+
+    public float ScaleFactorPosition = 200;
     public GameObject HapticActor;
-    public GameObject SpringAnchor;
     public GameObject HapticCollider;
-    public Transform EndPoint;
     public Transform Flange;
+    public Vector3 ultimaPosicion;
+    public Vector3 robotTCPPos;
+    public Vector3 robotTCPPosReal;
+    public Vector3 robotTCPRot;
+    public float tiempoAnterior;
+    public bool OPCUAIsConnected = false;
+    public Vector3 distancePos;
+    public Vector3 desplazamiento;
+    public Vector3 velocidadLineal;
 
 
     public OPCUA_Interface Interface;
@@ -48,10 +55,8 @@ public class EndEffectorController : MonoBehaviour
 
     private int activeCount = 0;
 
-    public bool trampeado = false;
 
     private HapticPlugin hapticPlugin;
-    private FollowObject followObject;
 
     void Start()
     {
@@ -66,116 +71,89 @@ public class EndEffectorController : MonoBehaviour
         socket.Connect(endPoint);
 
         hapticPlugin = HapticActor.GetComponent<HapticPlugin>();
-        followObject = GetComponent<FollowObject>();
+
     }
 
 
     private void FixedUpdate()
     {
         active = hapticPlugin.bIsGrabbing;
-        controlStatus = (string)Interface.ReadNodeValue(NodeId);
-        applicationStatus = (string)Interface.ReadNodeValue(NodeIdRunningApplication);
-        if (!string.IsNullOrEmpty(applicationStatus) || trampeado)
-        {
-            if (Waiting)
+            // Calcula el desplazamiento desde la última posición
+            desplazamiento = HapticCollider.transform.position - ultimaPosicion;
+
+            // Calcula la velocidad lineal (velocidad en unidades por segundo)
+            velocidadLineal = desplazamiento / (Time.time - tiempoAnterior);
+            velocidadLineal *= ScaleFactorPosition;
+
+
+            // Actualiza la última posición y rotación
+            ultimaPosicion = HapticCollider.transform.position;
+
+            // Actualiza el tiempo anterior
+            tiempoAnterior = Time.time;
+
+            // Imprime las velocidades en Vector3
+            Debug.Log("Velocidad Lineal: " + velocidadLineal + " unidades por segundo");
+
+
+            // Crear el socket UDP
+            //socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+            byte[] data = Encoding.UTF8.GetBytes(0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ";");
+
+
+            if (active)
             {
-                Waiting = false;
-                Invoke(nameof(SetWait), 2.0f);
+            data = Encoding.UTF8.GetBytes(velocidadLineal.x.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                velocidadLineal.y.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                velocidadLineal.z.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ";");
+
             }
 
-            if(controlStatus == "Connected" && SetInitialPosition)
+            else
             {
-                if (!active)
-                {
-                    //EndPoint.position = Flange.position;
-                    //EndPoint.rotation = Flange.rotation;
 
-                    followObject.SetInitialPositions();
-                    followObject.active = false;
-
-                    relativePosition = Vector3.zero;
-                    relativePositionRounded = Vector3.zero;
-
-                    relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
-                    relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y), Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
-
-                    //socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                    //active = true;
-                }
-                else
-                {
-
-                    relativePosition = transform.InverseTransformPoint(initialPoint.transform.position)*1000;
-                    relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y), Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
-
-                    RotationEndPointDegrees = (EndPoint.rotation * Quaternion.Inverse(initialPoint.transform.rotation)).eulerAngles;
-                    RotationEndPointDegreesRounded = new Vector3(ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.x)), ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.y)), ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.z))) ;
-
-                    byte[] data = Encoding.UTF8.GetBytes(relativePositionRounded.x.ToString("0000.00;-000.00") +
-                                                        ":" +
-                                                         relativePositionRounded.y.ToString("0000.00;-000.00") +
-                                                        ":" +
-                                                         relativePositionRounded.z.ToString("0000.00;-000.00") +
-                                                        ":" +
-                                                        RotationEndPointDegreesRounded.x.ToString("0000.00;-000.00") +
-                                                        ":" +
-                                                        RotationEndPointDegreesRounded.y.ToString("0000.00;-000.00") +
-                                                        ":" +
-                                                        RotationEndPointDegreesRounded.z.ToString("0000.00;-000.00") +
-                                                        ";");
-
-                    // Enviar el array de bytes al ordenador receptor
- 
-                        socket.SendTo(data, endPoint);
-
-                    followObject.active = true;
-                    Debug.Log("Enviando");
-                }  
+                data = Encoding.UTF8.GetBytes(0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ":" +
+                                                0.ToString("0000.00;-000.00") +
+                                                ";");
 
             }
-        }
-        else
-        {
-            relativePositionRounded = Vector3.zero;
-            followObject.active = false;
-            SpringAnchor.GetComponent<FollowObject>().enabled = false;
-            //socket.Close();
-            Interface.Restart();
-            active = false;
-            SetInitialPosition = false;
-            Waiting = true;
-        }
+            // Enviar el array de bytes al ordenador receptor
+            socket.SendTo(data, endPoint);
 
-        //byte[] receivedData = new byte[100];
-        //int k = socket.Receive(receivedData);
-        //Debug.Log(k);
 
     }
-    float ObtenerRotacionAjustada(float rotacionOriginal)
-    {
-        // Ajusta la rotación al rango de -180 a +180 grados
-        float rotacionAjustada = rotacionOriginal % 360f;
 
-        if (rotacionAjustada > 180f)
-        {
-            rotacionAjustada -= 360f;
-        }
-        else if (rotacionAjustada < -180f)
-        {
-            rotacionAjustada += 360f;
-        }
 
-        return rotacionAjustada;
-    }
-
-    public void SetWait()
-    {
-        SetInitialPosition = true;
-        EndPoint.position = Flange.position;
-        EndPoint.rotation = Flange.rotation;
-        //initialPoint.transform.position = Flange.position;
-        //initialPoint.transform.rotation = Flange.rotation;
-    }
 
     private void OnDisable()
     {
