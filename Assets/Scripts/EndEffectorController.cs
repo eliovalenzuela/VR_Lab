@@ -17,6 +17,7 @@ public class EndEffectorController : MonoBehaviour
     private Socket socket;
     private Socket socketReceive;
     private IPEndPoint endPoint;
+    private bool onlyOnceZero = true;
 
     IPAddress ipAdd = IPAddress.Parse("192.168.31.207");
     IPEndPoint remoteEP;
@@ -127,12 +128,14 @@ public class EndEffectorController : MonoBehaviour
                                                 ":" +
                                                 0.ToString("0000.00;-000.00") +
                                                 ";");
+            onlyOnceZero = true;
 
             }
 
             else
             {
-
+            if (onlyOnceZero)
+            {
                 data = Encoding.UTF8.GetBytes(0.ToString("0000.00;-000.00") +
                                                 ":" +
                                                 0.ToString("0000.00;-000.00") +
@@ -145,6 +148,8 @@ public class EndEffectorController : MonoBehaviour
                                                 ":" +
                                                 0.ToString("0000.00;-000.00") +
                                                 ";");
+                onlyOnceZero = false;
+            }
 
             }
             // Enviar el array de bytes al ordenador receptor
