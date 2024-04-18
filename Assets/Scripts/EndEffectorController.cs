@@ -26,7 +26,7 @@ public class EndEffectorController : MonoBehaviour
     public int port = 1;
     public string ip = "192.168.31.99";
 
-    public Vector3 relativePosition,relativePositionRounded;
+    public Vector3 relativePosition, relativePositionRounded;
     public Vector3 RotationEndPointDegrees = Vector3.zero;
     public Vector3 RotationEndPointDegreesRounded = Vector3.zero;
 
@@ -83,7 +83,7 @@ public class EndEffectorController : MonoBehaviour
                 Invoke(nameof(SetWait), 2.0f);
             }
 
-            if(controlStatus == "Connected" && SetInitialPosition)
+            if (controlStatus == "Connected" && SetInitialPosition)
             {
                 if (!active)
                 {
@@ -105,11 +105,11 @@ public class EndEffectorController : MonoBehaviour
                 else
                 {
 
-                    relativePosition = transform.InverseTransformPoint(initialPoint.transform.position)*1000;
+                    relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
                     relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y), Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
 
                     RotationEndPointDegrees = (EndPoint.rotation * Quaternion.Inverse(initialPoint.transform.rotation)).eulerAngles;
-                    RotationEndPointDegreesRounded = new Vector3(ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.x)), ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.y)), ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.z))) ;
+                    RotationEndPointDegreesRounded = new Vector3(ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.x)), ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.y)), ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.z)));
 
                     byte[] data = Encoding.UTF8.GetBytes(relativePositionRounded.x.ToString("0000.00;-000.00") +
                                                         ":" +
@@ -125,12 +125,12 @@ public class EndEffectorController : MonoBehaviour
                                                         ";");
 
                     // Enviar el array de bytes al ordenador receptor
- 
-                        socket.SendTo(data, endPoint);
+
+                    socket.SendTo(data, endPoint);
 
                     followObject.active = true;
                     Debug.Log("Enviando");
-                }  
+                }
 
             }
         }
@@ -173,6 +173,7 @@ public class EndEffectorController : MonoBehaviour
         SetInitialPosition = true;
         EndPoint.position = Flange.position;
         EndPoint.rotation = Flange.rotation;
+        followObject.SetInitialPositions();
         //initialPoint.transform.position = Flange.position;
         //initialPoint.transform.rotation = Flange.rotation;
     }
@@ -180,18 +181,18 @@ public class EndEffectorController : MonoBehaviour
     private void OnDisable()
     {
         // Cerrar el socket
-            socket.Close();
+        socket.Close();
     }
 
     private void OnDestroy()
     {
         // Cerrar el socket
-            socket.Close();
+        socket.Close();
     }
 
     private void OnApplicationQuit()
     {
         // Cerrar el socket
-            socket.Close();
+        socket.Close();
     }
 }

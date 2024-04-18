@@ -11,18 +11,21 @@ public class FollowObject : MonoBehaviour
 
     public Vector3 initialPosition;
     public Vector3 initialPositionFollowObject;
-    
+
     public Quaternion initialRotation;
     public Quaternion initialRotationFollowObject;
 
     private void FixedUpdate()
     {
-        if(GOToFollow != null && active)
+        if (GOToFollow != null && active)
         {
-            if(position)
-                transform.position = initialPosition + GOToFollow.transform.position- initialPositionFollowObject;
+            if (position)
+            {
+                Vector3 tempPosition = new Vector3(-(GOToFollow.transform.position.x - initialPositionFollowObject.x), GOToFollow.transform.position.y - initialPositionFollowObject.y, -(GOToFollow.transform.position.z - initialPositionFollowObject.z));
+                transform.position = initialPosition + tempPosition;
+            }
 
-            if(rotation)
+            if (rotation)
                 transform.rotation = initialRotation * (GOToFollow.transform.rotation * Quaternion.Inverse(initialRotationFollowObject));
         }
     }
