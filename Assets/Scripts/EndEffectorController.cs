@@ -32,23 +32,21 @@ public class EndEffectorController : MonoBehaviour
 
     public GameObject initialPoint;
     public GameObject HapticActor;
-    public GameObject SpringAnchor;
+    //public GameObject SpringAnchor;
     public GameObject HapticCollider;
     public Transform EndPoint;
     public Transform Flange;
 
 
     public OPCUA_Interface Interface;
-    public string NodeId = "ns=1;s=:Robot:Applications:Main_app:string:sOPCRobotyReady:sOPCRobotyReady[0]";
+    //public string NodeId = "ns=1;s=:Robot:Applications:Main_app:string:sOPCRobotyReady:sOPCRobotyReady[0]";
     public string NodeIdRunningApplication = "ns=1;s=:Robot:Applications:Main_app:string:sOPCRobotyReady:sOPCRobotyReady[0]";
     public string controlStatus;
-    public string applicationStatus;
+    //public string applicationStatus;
     //public Matrix4x4 worldToLocalMatrix;
     //public Vector3 tempos;
 
     private int activeCount = 0;
-
-    public bool trampeado = false;
 
     private HapticPlugin hapticPlugin;
     private FollowObject followObject;
@@ -73,9 +71,9 @@ public class EndEffectorController : MonoBehaviour
     private void FixedUpdate()
     {
         active = hapticPlugin.bIsGrabbing;
-        controlStatus = (string)Interface.ReadNodeValue(NodeId);
-        applicationStatus = (string)Interface.ReadNodeValue(NodeIdRunningApplication);
-        if (!string.IsNullOrEmpty(applicationStatus) || trampeado)
+        controlStatus = (string)Interface.ReadNodeValue(NodeIdRunningApplication);
+        //applicationStatus = (string)Interface.ReadNodeValue(NodeIdRunningApplication);
+        if (!string.IsNullOrEmpty(controlStatus))
         {
             if (Waiting)
             {
@@ -93,11 +91,11 @@ public class EndEffectorController : MonoBehaviour
                     followObject.SetInitialPositions();
                     followObject.active = false;
 
-                    relativePosition = Vector3.zero;
-                    relativePositionRounded = Vector3.zero;
+                    //relativePosition = Vector3.zero;
+                   // relativePositionRounded = Vector3.zero;
 
-                    relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
-                    relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y), Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
+                    //relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
+                    /// = new Vector3(-Mathf.RoundToInt(relativePosition.y), Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
 
                     //socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
                     //active = true;
@@ -138,7 +136,7 @@ public class EndEffectorController : MonoBehaviour
         {
             relativePositionRounded = Vector3.zero;
             followObject.active = false;
-            SpringAnchor.GetComponent<FollowObject>().enabled = false;
+            //SpringAnchor.GetComponent<FollowObject>().enabled = false;
             //socket.Close();
             Interface.Restart();
             active = false;
