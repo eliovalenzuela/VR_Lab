@@ -1272,6 +1272,11 @@ public class HapticPlugin : MonoBehaviour
     #endregion
     
     #region Public_Control_Functions 
+
+    public void SetForce(string configName, double[] direction, double magnitude)
+    {
+        setConstantForceValues(configName, direction, magnitude);
+    }
     public void EnableVibration()
     {
         setVibrationValues(DeviceIdentifier, Vector3ToDoubleArray(VibrationGDir), VibrationGMag, VibrationGFrequency, 0.0);
@@ -1394,7 +1399,11 @@ public class HapticPlugin : MonoBehaviour
 
     #endregion
 
+
+
     #region HapticDevice
+
+
     public bool InitializeHapticDevice()
     {
         bool success = false;
