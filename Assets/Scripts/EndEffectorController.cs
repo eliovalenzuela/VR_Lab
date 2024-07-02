@@ -106,7 +106,7 @@ public class EndEffectorController : MonoBehaviour
                 {
 
                     relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
-                    relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y), Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
+                    relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y),Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
 
                     RotationEndPointDegrees = (EndPoint.rotation * Quaternion.Inverse(initialPoint.transform.rotation)).eulerAngles;
                     RotationEndPointDegreesRounded = new Vector3(ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.x)), ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.y)), ObtenerRotacionAjustada(Mathf.RoundToInt(RotationEndPointDegrees.z)));

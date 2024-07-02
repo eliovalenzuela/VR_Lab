@@ -21,7 +21,7 @@ public class FollowObject : MonoBehaviour
         {
             if (position)
             {
-                Vector3 tempPosition = new Vector3(-(GOToFollow.transform.position.x - initialPositionFollowObject.x), GOToFollow.transform.position.y - initialPositionFollowObject.y, -(GOToFollow.transform.position.z - initialPositionFollowObject.z));
+                Vector3 tempPosition = new Vector3((GOToFollow.transform.position.x - initialPositionFollowObject.x), GOToFollow.transform.position.y - initialPositionFollowObject.y, (GOToFollow.transform.position.z - initialPositionFollowObject.z));
                 transform.position = initialPosition + tempPosition;
             }
 
