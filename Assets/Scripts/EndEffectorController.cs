@@ -45,11 +45,14 @@ public class EndEffectorController : MonoBehaviour
     //public string applicationStatus;
     //public Matrix4x4 worldToLocalMatrix;
     //public Vector3 tempos;
+    public UDPReceiver UDPReceiver;
 
     private int activeCount = 0;
 
     private HapticPlugin hapticPlugin;
     private FollowObject followObject;
+    private double MaxLimitForce;
+    private float magnitude;
 
     void Start()
     {
@@ -65,6 +68,7 @@ public class EndEffectorController : MonoBehaviour
 
         hapticPlugin = HapticActor.GetComponent<HapticPlugin>();
         followObject = GetComponent<FollowObject>();
+        MaxLimitForce = (double)Interface.ReadNodeValue("ns=1;s=:Robot:Applications:Main_app:num:FxLimit:FxLimit[0]");
     }
 
 
@@ -85,6 +89,7 @@ public class EndEffectorController : MonoBehaviour
             {
                 if (!active)
                 {
+                    hapticPlugin.SetForce("Default Device", new double[] { 1, 1, 1 }, 0);
                     //EndPoint.position = Flange.position;
                     //EndPoint.rotation = Flange.rotation;
 
@@ -102,6 +107,10 @@ public class EndEffectorController : MonoBehaviour
                 }
                 else
                 {
+                    
+                    magnitude = CalculateTotalForce(UDPReceiver.Fx, UDPReceiver.Fy, UDPReceiver.Fz);
+                    double[]  direction = { -UDPReceiver.Fy, -UDPReceiver.Fz, -UDPReceiver.Fx };
+                    hapticPlugin.SetForce("Default Device", direction, MapValue(magnitude, 1f, (float) MaxLimitForce, 0f, 1f));
 
                     relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
                     relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y),Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
@@ -137,8 +146,9 @@ public class EndEffectorController : MonoBehaviour
             relativePositionRounded = Vector3.zero;
             followObject.active = false;
             //SpringAnchor.GetComponent<FollowObject>().enabled = false;
+
             //socket.Close();
-            Interface.Restart();
+            //  terface.Restart();
             active = false;
             SetInitialPosition = false;
             Waiting = true;
@@ -174,6 +184,26 @@ public class EndEffectorController : MonoBehaviour
         followObject.SetInitialPositions();
         //initialPoint.transform.position = Flange.position;
         //initialPoint.transform.rotation = Flange.rotation;
+    }
+
+    float CalculateTotalForce(double fx, double fy, double fz)
+    {
+        // Aplicamos la fórmula de la magnitud del vector
+        
+        return Mathf.Sqrt((float)fx * (float)fx + (float)fy * (float)fy + (float)fz * (float)fz);
+    }
+
+    float MapValue(float value, float fromMin, float fromMax, float toMin, float toMax)
+    {
+        // Asegurar que fromMax y fromMin no sean iguales para evitar división por cero
+        if (fromMax == fromMin)
+        {
+            Debug.LogWarning("fromMax y fromMin no pueden ser iguales.");
+            return 0;
+        }
+
+        // Aplicar la fórmula de mapeo
+        return toMin + ((value - fromMin) / (fromMax - fromMin)) * (toMax - toMin);
     }
 
     private void OnDisable()
