@@ -53,6 +53,7 @@ public class EndEffectorController : MonoBehaviour
     private FollowObject followObject;
     private double MaxLimitForce;
     private float magnitude;
+    private bool buttonforce = true;
 
     void Start()
     {
@@ -110,7 +111,10 @@ public class EndEffectorController : MonoBehaviour
                     
                     magnitude = CalculateTotalForce(UDPReceiver.Fx, UDPReceiver.Fy, UDPReceiver.Fz);
                     double[]  direction = { -UDPReceiver.Fy, -UDPReceiver.Fz, -UDPReceiver.Fx };
-                    hapticPlugin.SetForce("Default Device", direction, MapValue(magnitude, 1f, (float) MaxLimitForce, 0f, 1f));
+                    if (buttonforce)
+                    {
+                        hapticPlugin.SetForce("Default Device", direction, MapValue(magnitude, 2f, (float)MaxLimitForce, 0f, 0.5f));
+                    }
 
                     relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
                     relativePositionRounded = new Vector3(-Mathf.RoundToInt(relativePosition.y),Mathf.RoundToInt(relativePosition.x), Mathf.RoundToInt(relativePosition.z));
@@ -204,6 +208,17 @@ public class EndEffectorController : MonoBehaviour
 
         // Aplicar la fórmula de mapeo
         return toMin + ((value - fromMin) / (fromMax - fromMin)) * (toMax - toMin);
+    }
+
+    public void ButtonForce() {
+        if (buttonforce)
+        {
+            buttonforce = false;
+        }
+        else {
+            buttonforce = true;
+        }
+            
     }
 
     private void OnDisable()
