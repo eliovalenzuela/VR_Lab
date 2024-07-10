@@ -78,6 +78,11 @@ public class EndEffectorController : MonoBehaviour
         active = hapticPlugin.bIsGrabbing;
         controlStatus = (string)Interface.ReadNodeValue(NodeIdRunningApplication);
         //applicationStatus = (string)Interface.ReadNodeValue(NodeIdRunningApplication);
+        if (controlStatus == "Restart") {
+            SetInitialPosition = false;
+            Waiting = true;
+
+        }
         if (!string.IsNullOrEmpty(controlStatus))
         {
             if (Waiting)
@@ -182,6 +187,7 @@ public class EndEffectorController : MonoBehaviour
 
     public void SetWait()
     {
+        initialPoint.transform.position = Flange.transform.position;
         SetInitialPosition = true;
         EndPoint.position = Flange.position;
         EndPoint.rotation = Flange.rotation;
