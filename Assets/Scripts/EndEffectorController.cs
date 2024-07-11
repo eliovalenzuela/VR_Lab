@@ -8,9 +8,13 @@ using game4automation;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
+using TMPro;
 
 public class EndEffectorController : MonoBehaviour
 {
+    public TMP_Text hapticFeedbackButton;
+    public Color hapticFeedbackOnColor;
+    public Color hapticFeedbackOffColor;
     public bool active = false;
     public bool SetInitialPosition = false;
     public bool Waiting = true;
@@ -46,6 +50,9 @@ public class EndEffectorController : MonoBehaviour
     //public Matrix4x4 worldToLocalMatrix;
     //public Vector3 tempos;
     public UDPReceiver UDPReceiver;
+    public float MinValueForceFeedback;
+    public float MaxValueForceFeedback;
+
 
     private int activeCount = 0;
 
@@ -70,6 +77,17 @@ public class EndEffectorController : MonoBehaviour
         hapticPlugin = HapticActor.GetComponent<HapticPlugin>();
         followObject = GetComponent<FollowObject>();
         MaxLimitForce = (double)Interface.ReadNodeValue("ns=1;s=:Robot:Applications:Main_app:num:FxLimit:FxLimit[0]");
+
+        if (!buttonforce)
+        {
+            hapticFeedbackButton.text = "Haptic Feedback Off";
+            hapticFeedbackButton.color = hapticFeedbackOffColor;
+        }
+        else
+        {
+            hapticFeedbackButton.text = "Haptic Feedback On";
+            hapticFeedbackButton.color = hapticFeedbackOnColor;
+        }
     }
 
 
@@ -118,7 +136,7 @@ public class EndEffectorController : MonoBehaviour
                     double[]  direction = { -UDPReceiver.Fy, -UDPReceiver.Fz, -UDPReceiver.Fx };
                     if (buttonforce)
                     {
-                        hapticPlugin.SetForce("Default Device", direction, MapValue(magnitude, 2f, (float)MaxLimitForce, 0f, 0.5f));
+                        hapticPlugin.SetForce("Default Device", direction, MapValue(magnitude, MinValueForceFeedback, (float)MaxLimitForce, 0f, MaxValueForceFeedback));
                     }
 
                     relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
@@ -157,7 +175,7 @@ public class EndEffectorController : MonoBehaviour
             //SpringAnchor.GetComponent<FollowObject>().enabled = false;
 
             //socket.Close();
-            //  terface.Restart();
+            Interface.Restart();
             active = false;
             SetInitialPosition = false;
             Waiting = true;
@@ -219,9 +237,13 @@ public class EndEffectorController : MonoBehaviour
     public void ButtonForce() {
         if (buttonforce)
         {
+            hapticFeedbackButton.text = "Haptic Feedback Off";
+            hapticFeedbackButton.color = hapticFeedbackOffColor;
             buttonforce = false;
         }
         else {
+            hapticFeedbackButton.text = "Haptic Feedback On";
+            hapticFeedbackButton.color = hapticFeedbackOnColor;
             buttonforce = true;
         }
             
