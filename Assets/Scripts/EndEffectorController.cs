@@ -58,12 +58,13 @@ public class EndEffectorController : MonoBehaviour
 
     private HapticPlugin hapticPlugin;
     private FollowObject followObject;
-    private double MaxLimitForce;
     private float magnitude;
     private bool buttonforce = true;
 
     void Start()
     {
+
+        Application.targetFrameRate = -1;
         // Crear el socket
         socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         //socketReceive = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -76,7 +77,6 @@ public class EndEffectorController : MonoBehaviour
 
         hapticPlugin = HapticActor.GetComponent<HapticPlugin>();
         followObject = GetComponent<FollowObject>();
-        MaxLimitForce = (double)Interface.ReadNodeValue("ns=1;s=:Robot:Applications:Main_app:num:FxLimit:FxLimit[0]");
 
         if (!buttonforce)
         {
@@ -88,13 +88,19 @@ public class EndEffectorController : MonoBehaviour
             hapticFeedbackButton.text = "Haptic Feedback On";
             hapticFeedbackButton.color = hapticFeedbackOnColor;
         }
+
+        InvokeRepeating(nameof(ReadControlStatus), 0, 0.5f);
+    }
+
+    public void ReadControlStatus()
+    {
+        controlStatus = (string)Interface.ReadNodeValue(NodeIdRunningApplication);
     }
 
 
     private void FixedUpdate()
     {
         active = hapticPlugin.bIsGrabbing;
-        controlStatus = (string)Interface.ReadNodeValue(NodeIdRunningApplication);
         //applicationStatus = (string)Interface.ReadNodeValue(NodeIdRunningApplication);
         if (controlStatus == "Restart") {
             SetInitialPosition = false;
@@ -134,9 +140,10 @@ public class EndEffectorController : MonoBehaviour
                     
                     magnitude = CalculateTotalForce(UDPReceiver.Fx, UDPReceiver.Fy, UDPReceiver.Fz);
                     double[]  direction = { -UDPReceiver.Fy, -UDPReceiver.Fz, -UDPReceiver.Fx };
+                    
                     if (buttonforce)
                     {
-                        hapticPlugin.SetForce("Default Device", direction, MapValue(magnitude, MinValueForceFeedback, (float)MaxLimitForce, 0f, MaxValueForceFeedback));
+                        hapticPlugin.SetForce("Default Device", direction, MaxValueForceFeedback);
                     }
 
                     relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
@@ -232,6 +239,31 @@ public class EndEffectorController : MonoBehaviour
 
         // Aplicar la fórmula de mapeo
         return toMin + ((value - fromMin) / (fromMax - fromMin)) * (toMax - toMin);
+    }
+
+    // Método para aplicar la rotación a un vector de direcciones
+    public static double[] ApplyRotationToDirection(double[] direction, Vector3 eulerRotation)
+    {
+        // Asegúrate de que el vector de direcciones tenga 3 componentes
+        if (direction.Length != 3)
+        {
+            Debug.LogError("El vector de direcciones debe tener 3 componentes.");
+            return null;
+        }
+
+        // Convierte el array de double a Vector3
+        Vector3 directionVector = new Vector3((float)direction[0], (float)direction[1], (float)direction[2]);
+
+        // Convierte la rotación de Euler en un cuaternión
+        Quaternion rotation = Quaternion.Euler(eulerRotation);
+
+        // Aplica la rotación al vector de dirección
+        Vector3 rotatedDirection = rotation * directionVector;
+
+        // Convierte el vector rotado de vuelta a un array de double
+        double[] rotatedDirectionArray = new double[] { rotatedDirection.x, rotatedDirection.y, rotatedDirection.z };
+
+        return rotatedDirectionArray;
     }
 
     public void ButtonForce() {

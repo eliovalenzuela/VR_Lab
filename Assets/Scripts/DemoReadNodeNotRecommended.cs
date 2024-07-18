@@ -9,6 +9,7 @@ public class DemoReadNodeNotRecommended : MonoBehaviour
     public string NodeId;
     public double myvar;
     public bool x, y, z;
+    public float timeInSeconds;
     private float initialRotationX, initialRotationY, initialRotationZ;
 
     private void Awake()
@@ -18,10 +19,20 @@ public class DemoReadNodeNotRecommended : MonoBehaviour
         initialRotationZ = transform.localRotation.eulerAngles.z;
     }
 
-    void Update()
+    private void Start()
+    {
+        Application.targetFrameRate = -1;
+
+        InvokeRepeating(nameof(ReadValue), 0, timeInSeconds);
+    }
+
+    public void ReadValue()
     {
         myvar = (double)Interface.ReadNodeValue(NodeId);
+    }
 
+    void Update()
+    {
         if (x)
         {
             transform.localRotation = Quaternion.Euler(new Vector3(initialRotationX + (float)myvar, initialRotationY, initialRotationZ));
@@ -38,4 +49,6 @@ public class DemoReadNodeNotRecommended : MonoBehaviour
         }
         
     }
+
+    
 }

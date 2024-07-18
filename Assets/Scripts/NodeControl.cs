@@ -9,13 +9,19 @@ public class NodeControl : MonoBehaviour
     public string NodeId;
 
     public bool x, y, z;
-    public float NodeValue;
-    public float PositionX;
-    public float PositionY;
-    public float PositionZ;
+    public double NodeValue =0.0f;
 
     private OPCUA_Node node;
     private OPCUANodeSubscription subscription;
+
+    private float initialRotationX, initialRotationY, initialRotationZ;
+
+    private void Awake()
+    {
+        initialRotationX = transform.localRotation.eulerAngles.x;
+        initialRotationY = transform.localRotation.eulerAngles.y;
+        initialRotationZ = transform.localRotation.eulerAngles.z;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -33,27 +39,25 @@ public class NodeControl : MonoBehaviour
 
     public void NodeChanged(OPCUANodeSubscription sub, object obj) // Is called when Node Value of Node nodeid is changed
     {
-        NodeValue = (float)obj;
+        NodeValue = (double)obj;
+
+    }
+
+    void Update()
+    {
         if (x)
         {
-            PositionX = (float)obj; // sets the new position based on the new value 
+            transform.localRotation = Quaternion.Euler(new Vector3(initialRotationX + (float)NodeValue, initialRotationY, initialRotationZ));
         }
 
         if (y)
         {
-            PositionY = (float)obj; // sets the new position based on the new value 
+            transform.localRotation = Quaternion.Euler(new Vector3(initialRotationX, initialRotationY + (float)NodeValue, initialRotationZ));
         }
 
         if (z)
         {
-            PositionZ = (float)obj; // sets the new position based on the new value 
+            transform.localRotation = Quaternion.Euler(new Vector3(initialRotationX, initialRotationY, initialRotationZ + (float)NodeValue));
         }
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        transform.localRotation = Quaternion.Euler(new Vector3(PositionX, PositionY, PositionZ));
     }
 }

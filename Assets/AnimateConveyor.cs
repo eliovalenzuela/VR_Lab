@@ -17,8 +17,14 @@ public class AnimateConveyor : MonoBehaviour
     private void Start()
     {
         initialPosition = (double)PLC_Interface.ReadNodeValue(NodeIdPosition);
+        InvokeRepeating(nameof(ReadValue), 0, 0.2f);
     }
 
+    public void ReadValue()
+    {
+        actualPosition = (double)PLC_Interface.ReadNodeValue(NodeIdPosition);
+        actualVelocity = (double)PLC_Interface.ReadNodeValue(NodeIdVelocity);
+    }
     public Transform conveyor;
     public Transform alturaMinimaReferencia;
     public Transform alturaMaximaReferencia;
@@ -36,9 +42,6 @@ public class AnimateConveyor : MonoBehaviour
 
     void Update()
     {
-        actualPosition = (double)PLC_Interface.ReadNodeValue(NodeIdPosition);
-        actualVelocity = (double)PLC_Interface.ReadNodeValue(NodeIdVelocity);
-
         ConveyorDrive.CurrentPosition = (float)(actualPosition - initialPosition);
         ConveyorDrive.CurrentSpeed = (float)-actualVelocity;
     }

@@ -12,13 +12,17 @@ public class PrecisionMode : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
+        InvokeRepeating(nameof(ReadMode), 0, 0.5f);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ReadMode()
     {
         mode = (bool)Interfaz.ReadNodeValue("ns=1;s=:Robot:Applications:Main_app:bool:OpcPreciseMode:OpcPreciseMode[0]");
+    }
+    void Update()
+    {
+        
 
         if (mode)
         {

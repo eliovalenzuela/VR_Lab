@@ -14,7 +14,13 @@ public class AnimationController : MonoBehaviour
     public AnimatePlatform animadorPlatform;
     public AnimateBox animadorBox;
 
-    private void Update()
+    private void Start()
+    {
+
+        InvokeRepeating(nameof(ReadValue), 0, 0.2f);
+    }
+
+    public void ReadValue()
     {
         myvar = (short)Interface.ReadNodeValue(NodeId);
     }

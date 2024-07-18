@@ -12,10 +12,19 @@ public class CameraDetector : MonoBehaviour
     public OPCUA_Interface Interface;
     public string NodeId;
 
-    void Update()
+    private void Start()
+    {
+
+        InvokeRepeating(nameof(ReadValue), 0, 0.5f);
+    }
+
+    public void ReadValue()
     {
         currentCamera = (short)Interface.ReadNodeValue(NodeId);
+    }
 
+    void Update()
+    {
         if (previousCamera!= currentCamera)
         {
             SetCamera(currentCamera);
