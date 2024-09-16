@@ -51,14 +51,14 @@ public class EndEffectorController : MonoBehaviour
     //public Vector3 tempos;
     public UDPReceiver UDPReceiver;
     public float MinValueForceFeedback;
-    public float MaxValueForceFeedback;
+    public float ForceFeedbackScaleFactor;
 
 
     private int activeCount = 0;
 
     private HapticPlugin hapticPlugin;
     private FollowObject followObject;
-    private float magnitude;
+    public float magnitude;
     private bool buttonforce = true;
 
     void Start()
@@ -143,7 +143,7 @@ public class EndEffectorController : MonoBehaviour
                     
                     if (buttonforce)
                     {
-                        hapticPlugin.SetForce("Default Device", direction, MaxValueForceFeedback);
+                        hapticPlugin.SetForce("Default Device", direction, ForceFeedbackScaleFactor* magnitude);
                     }
 
                     relativePosition = transform.InverseTransformPoint(initialPoint.transform.position) * 1000;
